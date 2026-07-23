@@ -1,0 +1,126 @@
+============================================================
+PANDUAN PUBLIKASI DOMPETKU KE GITHUB PAGES
+============================================================
+
+DompetKu dapat dipasang gratis melalui GitHub Pages.
+
+PENTING TENTANG PRIVASI:
+
+- GitHub hanya menyimpan aplikasi.
+- Data transaksi tidak masuk ke repository GitHub.
+- Data tersimpan di browser perangkat yang digunakan.
+- Gunakan tombol Backup JSON secara berkala.
+
+
+A. PERSIAPAN
+------------------------------------------------------------
+
+1. Buat akun di https://github.com jika belum memiliki akun.
+2. Ekstrak file ZIP proyek DompetKu.
+3. Pastikan di dalamnya terdapat folder "docs".
+
+Folder "docs" adalah aplikasi yang sudah siap dipublikasikan.
+
+
+B. MEMBUAT REPOSITORY
+------------------------------------------------------------
+
+1. Masuk ke GitHub.
+2. Klik tombol New repository.
+3. Isi nama repository, misalnya:
+
+   dompetku
+
+4. Pilih Public.
+5. Klik Create repository.
+
+
+C. MENGUNGGAH PROYEK
+------------------------------------------------------------
+
+Cara melalui Command Prompt:
+
+1. Buka folder proyek DompetKu.
+2. Klik kolom alamat pada File Explorer.
+3. Ketik:
+
+   cmd
+
+4. Tekan Enter.
+5. Jalankan perintah berikut satu per satu:
+
+git init
+
+git add .
+
+git commit -m "Publikasi DompetKu"
+
+git branch -M main
+
+git remote add origin https://github.com/NAMA-USER/NAMA-REPOSITORY.git
+
+git push -u origin main
+
+Ganti NAMA-USER dan NAMA-REPOSITORY sesuai akun GitHub.
+
+
+D. MENGAKTIFKAN GITHUB PAGES
+------------------------------------------------------------
+
+1. Buka repository DompetKu di GitHub.
+2. Klik Settings.
+3. Klik Pages.
+4. Pada Build and deployment, pilih:
+
+   Source : Deploy from a branch
+   Branch : main
+   Folder : /docs
+
+5. Klik Save.
+6. Tunggu beberapa menit sampai proses selesai.
+7. GitHub akan menampilkan alamat aplikasi.
+
+Contoh alamat:
+
+https://namaanda.github.io/dompetku/
+
+
+E. MENJALANKAN DAN MENGUBAH SOURCE CODE
+------------------------------------------------------------
+
+Persyaratan:
+
+Node.js versi 22.13 atau lebih baru.
+
+Instal dependency:
+
+npm install --include=optional
+
+Jalankan aplikasi:
+
+npm run dev
+
+Setelah source code diubah, buat ulang versi GitHub Pages:
+
+npm run build:github
+
+Kemudian kirim perubahan:
+
+git add .
+
+git commit -m "Pembaruan aplikasi"
+
+git push
+
+
+F. BACKUP DATA
+------------------------------------------------------------
+
+1. Buka aplikasi DompetKu.
+2. Klik Backup JSON.
+3. Simpan file backup pada tempat yang aman.
+4. Untuk mengembalikan data, klik Pulihkan Data.
+
+Data pada browser Chrome dan Microsoft Edge tidak otomatis sama.
+Lakukan backup dan pemulihan apabila berpindah browser atau perangkat.
+
