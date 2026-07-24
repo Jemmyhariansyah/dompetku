@@ -213,8 +213,7 @@ function csvValue(value: string | number) {
 }
 
 export default function FinanceApp() {
-  const [transactions, setTransactions] =
-    useState<Transaction[]>(SEED_TRANSACTIONS);
+  const [transactions, setTransactions] = useState<Transaction[]>(SEED_TRANSACTIONS);
   const [budget, setBudget] = useState(5000000);
   const [budgetDraft, setBudgetDraft] = useState("5000000");
   const [selectedMonth, setSelectedMonth] = useState("2026-07");
@@ -237,10 +236,7 @@ export default function FinanceApp() {
         const raw = window.localStorage.getItem(STORAGE_KEY);
         if (raw) {
           const saved = JSON.parse(raw) as Partial<StoredData>;
-          if (
-            Array.isArray(saved.transactions) &&
-            saved.transactions.every(isTransaction)
-          ) {
+          if (Array.isArray(saved.transactions) && saved.transactions.every(isTransaction)) {
             if (!cancelled) setTransactions(saved.transactions);
           }
           if (typeof saved.budget === "number" && saved.budget >= 0) {
@@ -278,18 +274,11 @@ export default function FinanceApp() {
     return () => window.clearTimeout(timer);
   }, [toast]);
 
-  const monthTransactions = useMemo(
-    () => transactions.filter((item) => item.date.startsWith(selectedMonth)),
-    [selectedMonth, transactions],
-  );
+  const monthTransactions = useMemo(() => transactions.filter((item) => item.date.startsWith(selectedMonth)), [selectedMonth, transactions]);
 
   const metrics = useMemo(() => {
-    const income = monthTransactions
-      .filter((item) => item.type === "income")
-      .reduce((sum, item) => sum + item.amount, 0);
-    const expense = monthTransactions
-      .filter((item) => item.type === "expense")
-      .reduce((sum, item) => sum + item.amount, 0);
+    const income = monthTransactions.filter((item) => item.type === "income").reduce((sum, item) => sum + item.amount, 0);
+    const expense = monthTransactions.filter((item) => item.type === "expense").reduce((sum, item) => sum + item.amount, 0);
     const balance = income - expense;
     const savingsRate = income > 0 ? Math.round((balance / income) * 100) : 0;
     return { income, expense, balance, savingsRate };
@@ -298,58 +287,27 @@ export default function FinanceApp() {
   const expenseByCategory = useMemo(() => {
     return EXPENSE_CATEGORIES.map((category) => ({
       ...category,
-      value: monthTransactions
-        .filter(
-          (item) =>
-            item.type === "expense" && item.category === category.name,
-        )
-        .reduce((sum, item) => sum + item.amount, 0),
+      value: monthTransactions.filter((item) => item.type === "expense" && item.category === category.name).reduce((sum, item) => sum + item.amount, 0),
     }))
       .filter((item) => item.value > 0)
       .sort((a, b) => b.value - a.value);
   }, [monthTransactions]);
 
-  const availableCategories = useMemo(
-    () =>
-      [
-        ...new Set(
-          transactions
-            .filter((item) => item.date.startsWith(selectedMonth))
-            .map((item) => item.category),
-        ),
-      ].sort(),
-    [selectedMonth, transactions],
-  );
+  const availableCategories = useMemo(() => [...new Set(transactions.filter((item) => item.date.startsWith(selectedMonth)).map((item) => item.category))].sort(), [selectedMonth, transactions]);
 
   const filteredTransactions = useMemo(() => {
     const query = search.trim().toLowerCase();
     return monthTransactions
       .filter((item) => {
         const matchesType = typeFilter === "all" || item.type === typeFilter;
-        const matchesCategory =
-          categoryFilter === "all" || item.category === categoryFilter;
-        const matchesSearch =
-          !query ||
-          [item.note, item.category, item.payment]
-            .join(" ")
-            .toLowerCase()
-            .includes(query);
+        const matchesCategory = categoryFilter === "all" || item.category === categoryFilter;
+        const matchesSearch = !query || [item.note, item.category, item.payment].join(" ").toLowerCase().includes(query);
         return matchesType && matchesCategory && matchesSearch;
       })
-      .sort(
-        (a, b) =>
-          b.date.localeCompare(a.date) ||
-          b.createdAt.localeCompare(a.createdAt),
-      );
-  }, [
-    categoryFilter,
-    monthTransactions,
-    search,
-    typeFilter,
-  ]);
+      .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt));
+  }, [categoryFilter, monthTransactions, search, typeFilter]);
 
-  const budgetUsed =
-    budget > 0 ? Math.min(100, Math.round((metrics.expense / budget) * 100)) : 0;
+  const budgetUsed = budget > 0 ? Math.min(100, Math.round((metrics.expense / budget) * 100)) : 0;
 
   const donutBackground = useMemo(() => {
     const total = Math.max(1, metrics.expense);
@@ -361,13 +319,10 @@ export default function FinanceApp() {
         const end = current.offset + (item.value / total) * 100;
         return {
           offset: end,
-          values: [
-            ...current.values,
-            `${item.color} ${current.offset}% ${end}%`,
-          ],
+          values: [...current.values, `${item.color} ${current.offset}% ${end}%`],
         };
       },
-      { offset: 0, values: [] },
+      { offset: 0, values: [] }
     ).values;
     if (!stops.length) return "conic-gradient(#e7edf5 0 100%)";
     return `conic-gradient(${stops.join(",")})`;
@@ -377,24 +332,14 @@ export default function FinanceApp() {
     const [year, month] = selectedMonth.split("-").map(Number);
     return Array.from({ length: 6 }, (_, index) => {
       const date = new Date(year, month - 1 - (5 - index), 1);
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-        2,
-        "0",
-      )}`;
-      const income = transactions
-        .filter((item) => item.type === "income" && item.date.startsWith(key))
-        .reduce((sum, item) => sum + item.amount, 0);
-      const expense = transactions
-        .filter((item) => item.type === "expense" && item.date.startsWith(key))
-        .reduce((sum, item) => sum + item.amount, 0);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      const income = transactions.filter((item) => item.type === "income" && item.date.startsWith(key)).reduce((sum, item) => sum + item.amount, 0);
+      const expense = transactions.filter((item) => item.type === "expense" && item.date.startsWith(key)).reduce((sum, item) => sum + item.amount, 0);
       return { key, label: monthLabel(key, true), income, expense };
     });
   }, [selectedMonth, transactions]);
 
-  const maxTrend = Math.max(
-    1,
-    ...monthTrend.flatMap((item) => [item.income, item.expense]),
-  );
+  const maxTrend = Math.max(1, ...monthTrend.flatMap((item) => [item.income, item.expense]));
 
   function openCreate(type: TransactionType = "expense") {
     setEditingId(null);
@@ -448,11 +393,7 @@ export default function FinanceApp() {
     }
 
     if (editingId) {
-      setTransactions((current) =>
-        current.map((item) =>
-          item.id === editingId ? { ...item, ...form } : item,
-        ),
-      );
+      setTransactions((current) => current.map((item) => (item.id === editingId ? { ...item, ...form } : item)));
       setToast("Transaksi berhasil diperbarui.");
     } else {
       const created: Transaction = {
@@ -467,18 +408,10 @@ export default function FinanceApp() {
   }
 
   function deleteTransaction(transaction: Transaction) {
-    if (
-      !window.confirm(
-        `Hapus transaksi “${transaction.note}” senilai ${formatCurrency(
-          transaction.amount,
-        )}?`,
-      )
-    ) {
+    if (!window.confirm(`Hapus transaksi “${transaction.note}” senilai ${formatCurrency(transaction.amount)}?`)) {
       return;
     }
-    setTransactions((current) =>
-      current.filter((item) => item.id !== transaction.id),
-    );
+    setTransactions((current) => current.filter((item) => item.id !== transaction.id));
     setToast("Transaksi telah dihapus.");
   }
 
@@ -493,40 +426,16 @@ export default function FinanceApp() {
   }
 
   function exportCsv() {
-    const header = [
-      "Tanggal",
-      "Jenis",
-      "Kategori",
-      "Keterangan",
-      "Metode Pembayaran",
-      "Nominal",
-    ];
-    const rows = filteredTransactions.map((item) => [
-      item.date,
-      item.type === "expense" ? "Pengeluaran" : "Pemasukan",
-      item.category,
-      item.note,
-      item.payment,
-      item.amount,
-    ]);
-    const csv = [header, ...rows]
-      .map((row) => row.map(csvValue).join(","))
-      .join("\n");
-    downloadBlob(
-      `\uFEFF${csv}`,
-      "text/csv;charset=utf-8",
-      `catatuang-${selectedMonth}.csv`,
-    );
+    const header = ["Tanggal", "Jenis", "Kategori", "Keterangan", "Metode Pembayaran", "Nominal"];
+    const rows = filteredTransactions.map((item) => [item.date, item.type === "expense" ? "Pengeluaran" : "Pemasukan", item.category, item.note, item.payment, item.amount]);
+    const csv = [header, ...rows].map((row) => row.map(csvValue).join(",")).join("\n");
+    downloadBlob(`\uFEFF${csv}`, "text/csv;charset=utf-8", `catatuang-${selectedMonth}.csv`);
     setToast("Laporan CSV berhasil dibuat.");
   }
 
   function backupData() {
     const payload: StoredData = { version: 1, budget, transactions };
-    downloadBlob(
-      JSON.stringify(payload, null, 2),
-      "application/json",
-      `backup-catatuang-${new Date().toISOString().slice(0, 10)}.json`,
-    );
+    downloadBlob(JSON.stringify(payload, null, 2), "application/json", `backup-catatuang-${new Date().toISOString().slice(0, 10)}.json`);
     setToast("Backup data berhasil dibuat.");
   }
 
@@ -536,18 +445,10 @@ export default function FinanceApp() {
     if (!file) return;
     try {
       const parsed = JSON.parse(await file.text()) as Partial<StoredData>;
-      if (
-        !Array.isArray(parsed.transactions) ||
-        !parsed.transactions.every(isTransaction) ||
-        typeof parsed.budget !== "number"
-      ) {
+      if (!Array.isArray(parsed.transactions) || !parsed.transactions.every(isTransaction) || typeof parsed.budget !== "number") {
         throw new Error("Format file backup tidak sesuai.");
       }
-      if (
-        !window.confirm(
-          `Pulihkan ${parsed.transactions.length} transaksi? Data saat ini akan diganti.`,
-        )
-      ) {
+      if (!window.confirm(`Pulihkan ${parsed.transactions.length} transaksi? Data saat ini akan diganti.`)) {
         return;
       }
       setTransactions(parsed.transactions);
@@ -555,9 +456,7 @@ export default function FinanceApp() {
       setBudgetDraft(String(parsed.budget));
       setToast("Data berhasil dipulihkan.");
     } catch (error) {
-      setToast(
-        error instanceof Error ? error.message : "Backup tidak dapat dibaca.",
-      );
+      setToast(error instanceof Error ? error.message : "Backup tidak dapat dibaca.");
     }
   }
 
@@ -601,19 +500,11 @@ export default function FinanceApp() {
         </div>
       </aside>
 
-      <button
-        className="sidebar-scrim"
-        aria-label="Tutup menu"
-        onClick={() => setMobileNavOpen(false)}
-      />
+      <button className="sidebar-scrim" aria-label="Tutup menu" onClick={() => setMobileNavOpen(false)} />
 
       <main className="main-area">
         <header className="app-header">
-          <button
-            className="menu-button"
-            aria-label="Buka menu"
-            onClick={() => setMobileNavOpen(true)}
-          >
+          <button className="menu-button" aria-label="Buka menu" onClick={() => setMobileNavOpen(true)}>
             ☰
           </button>
           <div className="welcome">
@@ -656,11 +547,7 @@ export default function FinanceApp() {
                 <span className="metric-icon">◈</span>
               </div>
               <strong>{formatCurrency(metrics.balance)}</strong>
-              <small>
-                {metrics.balance >= 0
-                  ? "Arus kas masih positif"
-                  : "Pengeluaran melebihi pemasukan"}
-              </small>
+              <small>{metrics.balance >= 0 ? "Arus kas masih positif" : "Pengeluaran melebihi pemasukan"}</small>
             </article>
             <article className="metric-card">
               <div className="metric-top">
@@ -668,9 +555,7 @@ export default function FinanceApp() {
                 <span className="metric-icon income">↙</span>
               </div>
               <strong>{formatCurrency(metrics.income)}</strong>
-              <small className="positive">
-                {monthTransactions.filter((item) => item.type === "income").length} transaksi masuk
-              </small>
+              <small className="positive">{monthTransactions.filter((item) => item.type === "income").length} transaksi masuk</small>
             </article>
             <article className="metric-card">
               <div className="metric-top">
@@ -678,9 +563,7 @@ export default function FinanceApp() {
                 <span className="metric-icon expense">↗</span>
               </div>
               <strong>{formatCurrency(metrics.expense)}</strong>
-              <small>
-                {monthTransactions.filter((item) => item.type === "expense").length} transaksi keluar
-              </small>
+              <small>{monthTransactions.filter((item) => item.type === "expense").length} transaksi keluar</small>
             </article>
             <article className="metric-card">
               <div className="metric-top">
@@ -688,11 +571,7 @@ export default function FinanceApp() {
                 <span className="metric-icon saving">%</span>
               </div>
               <strong>{metrics.savingsRate}%</strong>
-              <small>
-                {metrics.savingsRate >= 20
-                  ? "Bagus, pertahankan kebiasaan ini"
-                  : "Target sehat: minimal 20%"}
-              </small>
+              <small>{metrics.savingsRate >= 20 ? "Bagus, pertahankan kebiasaan ini" : "Target sehat: minimal 20%"}</small>
             </article>
           </div>
 
@@ -704,24 +583,20 @@ export default function FinanceApp() {
                   <h3>Perbandingan 6 bulan</h3>
                 </div>
                 <div className="legend">
-                  <span><i className="income-dot" /> Pemasukan</span>
-                  <span><i className="expense-dot" /> Pengeluaran</span>
+                  <span>
+                    <i className="income-dot" /> Pemasukan
+                  </span>
+                  <span>
+                    <i className="expense-dot" /> Pengeluaran
+                  </span>
                 </div>
               </div>
               <div className="bar-chart" aria-label="Grafik pemasukan dan pengeluaran enam bulan">
                 {monthTrend.map((item) => (
                   <div className="bar-group" key={item.key}>
                     <div className="bars">
-                      <span
-                        className="bar bar-income"
-                        style={{ height: `${Math.max(3, (item.income / maxTrend) * 100)}%` }}
-                        title={`Pemasukan ${formatCurrency(item.income)}`}
-                      />
-                      <span
-                        className="bar bar-expense"
-                        style={{ height: `${Math.max(3, (item.expense / maxTrend) * 100)}%` }}
-                        title={`Pengeluaran ${formatCurrency(item.expense)}`}
-                      />
+                      <span className="bar bar-income" style={{ height: `${Math.max(3, (item.income / maxTrend) * 100)}%` }} title={`Pemasukan ${formatCurrency(item.income)}`} />
+                      <span className="bar bar-expense" style={{ height: `${Math.max(3, (item.expense / maxTrend) * 100)}%` }} title={`Pengeluaran ${formatCurrency(item.expense)}`} />
                     </div>
                     <small>{item.label}</small>
                   </div>
@@ -770,35 +645,23 @@ export default function FinanceApp() {
               <span className="eyebrow">Kontrol pengeluaran</span>
               <h3>Anggaran bulanan</h3>
               <p>
-                Terpakai {formatCurrency(metrics.expense)} dari{" "}
-                {formatCurrency(budget)}
+                Terpakai {formatCurrency(metrics.expense)} dari {formatCurrency(budget)}
               </p>
             </div>
           </div>
           <div className="budget-progress-wrap">
             <div className="budget-progress-meta">
               <span>{budgetUsed}% terpakai</span>
-              <strong>
-                Sisa {formatCurrency(Math.max(0, budget - metrics.expense))}
-              </strong>
+              <strong>Sisa {formatCurrency(Math.max(0, budget - metrics.expense))}</strong>
             </div>
             <div className="progress-track">
-              <span
-                className={budgetUsed >= 90 ? "danger-progress" : ""}
-                style={{ width: `${budgetUsed}%` }}
-              />
+              <span className={budgetUsed >= 90 ? "danger-progress" : ""} style={{ width: `${budgetUsed}%` }} />
             </div>
           </div>
           <div className="budget-edit">
             <label>
               <span>Target anggaran</span>
-              <input
-                type="number"
-                min="0"
-                step="50000"
-                value={budgetDraft}
-                onChange={(event) => setBudgetDraft(event.target.value)}
-              />
+              <input type="number" min="0" step="50000" value={budgetDraft} onChange={(event) => setBudgetDraft(event.target.value)} />
             </label>
             <button onClick={saveBudget}>Simpan</button>
           </div>
@@ -823,18 +686,11 @@ export default function FinanceApp() {
             <label className="search-field">
               <span className="sr-only">Cari transaksi</span>
               <i>⌕</i>
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Cari keterangan, kategori, metode…"
-              />
+              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Cari keterangan, kategori, metode…" />
             </label>
             <label>
               <span className="sr-only">Filter jenis transaksi</span>
-              <select
-                value={typeFilter}
-                onChange={(event) => setTypeFilter(event.target.value)}
-              >
+              <select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}>
                 <option value="all">Semua jenis</option>
                 <option value="expense">Pengeluaran</option>
                 <option value="income">Pemasukan</option>
@@ -842,10 +698,7 @@ export default function FinanceApp() {
             </label>
             <label>
               <span className="sr-only">Filter kategori</span>
-              <select
-                value={categoryFilter}
-                onChange={(event) => setCategoryFilter(event.target.value)}
-              >
+              <select value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
                 <option value="all">Semua kategori</option>
                 {availableCategories.map((category) => (
                   <option key={category}>{category}</option>
@@ -860,10 +713,7 @@ export default function FinanceApp() {
                 const meta = categoryMeta(transaction.category, transaction.type);
                 return (
                   <article className="transaction-item" key={transaction.id}>
-                    <span
-                      className="transaction-icon"
-                      style={{ background: `${meta.color}18`, color: meta.color }}
-                    >
+                    <span className="transaction-icon" style={{ background: `${meta.color}18`, color: meta.color }}>
                       {meta.icon}
                     </span>
                     <div className="transaction-main">
@@ -872,31 +722,16 @@ export default function FinanceApp() {
                         {transaction.category} · {transaction.payment}
                       </span>
                     </div>
-                    <time dateTime={transaction.date}>
-                      {formatDate(transaction.date)}
-                    </time>
-                    <strong
-                      className={
-                        transaction.type === "income"
-                          ? "amount income-amount"
-                          : "amount"
-                      }
-                    >
+                    <time dateTime={transaction.date}>{formatDate(transaction.date)}</time>
+                    <strong className={transaction.type === "income" ? "amount income-amount" : "amount"}>
                       {transaction.type === "income" ? "+" : "−"}
                       {formatCurrency(transaction.amount)}
                     </strong>
                     <div className="row-actions">
-                      <button
-                        aria-label={`Edit ${transaction.note}`}
-                        onClick={() => openEdit(transaction)}
-                      >
+                      <button aria-label={`Edit ${transaction.note}`} onClick={() => openEdit(transaction)}>
                         Edit
                       </button>
-                      <button
-                        className="delete-button"
-                        aria-label={`Hapus ${transaction.note}`}
-                        onClick={() => deleteTransaction(transaction)}
-                      >
+                      <button className="delete-button" aria-label={`Hapus ${transaction.note}`} onClick={() => deleteTransaction(transaction)}>
                         Hapus
                       </button>
                     </div>
@@ -920,25 +755,13 @@ export default function FinanceApp() {
           <div>
             <span className="eyebrow">Backup dan laporan</span>
             <h3>Data milikmu, kendali tetap di tanganmu</h3>
-            <p>
-              Unduh laporan atau buat backup rutin agar catatan dapat
-              dipindahkan ke perangkat lain.
-            </p>
+            <p>Unduh laporan atau buat backup rutin agar catatan dapat dipindahkan ke perangkat lain.</p>
           </div>
           <div className="report-actions">
             <button onClick={exportCsv}>Unduh CSV</button>
             <button onClick={backupData}>Backup JSON</button>
-            <button onClick={() => restoreRef.current?.click()}>
-              Pulihkan Data
-            </button>
-            <input
-              ref={restoreRef}
-              className="sr-only"
-              type="file"
-              accept=".json,application/json"
-              onChange={restoreData}
-              tabIndex={-1}
-            />
+            <button onClick={() => restoreRef.current?.click()}>Pulihkan Data</button>
+            <input ref={restoreRef} className="sr-only" type="file" accept=".json,application/json" onChange={restoreData} tabIndex={-1} />
           </div>
         </section>
 
@@ -950,39 +773,23 @@ export default function FinanceApp() {
 
       {modalOpen && (
         <div className="modal-backdrop" onMouseDown={closeModal}>
-          <section
-            className="transaction-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="transaction-modal-title"
-            onMouseDown={(event) => event.stopPropagation()}
-          >
+          <section className="transaction-modal" role="dialog" aria-modal="true" aria-labelledby="transaction-modal-title" onMouseDown={(event) => event.stopPropagation()}>
             <div className="modal-heading">
               <div>
-                <span className="eyebrow">
-                  {editingId ? "Perbarui catatan" : "Catatan baru"}
-                </span>
-                <h2 id="transaction-modal-title">
-                  {editingId ? "Edit transaksi" : "Catat transaksi"}
-                </h2>
+                <span className="eyebrow">{editingId ? "Perbarui catatan" : "Catatan baru"}</span>
+                <h2 id="transaction-modal-title">{editingId ? "Edit transaksi" : "Catat transaksi"}</h2>
               </div>
-              <button aria-label="Tutup" onClick={closeModal}>×</button>
+              <button aria-label="Tutup" onClick={closeModal}>
+                ×
+              </button>
             </div>
 
             <form onSubmit={saveTransaction}>
               <div className="type-switch" aria-label="Jenis transaksi">
-                <button
-                  type="button"
-                  className={form.type === "expense" ? "selected expense-selected" : ""}
-                  onClick={() => changeType("expense")}
-                >
+                <button type="button" className={form.type === "expense" ? "selected expense-selected" : ""} onClick={() => changeType("expense")}>
                   Pengeluaran
                 </button>
-                <button
-                  type="button"
-                  className={form.type === "income" ? "selected income-selected" : ""}
-                  onClick={() => changeType("income")}
-                >
+                <button type="button" className={form.type === "income" ? "selected income-selected" : ""} onClick={() => changeType("income")}>
                   Pemasukan
                 </button>
               </div>
@@ -995,7 +802,7 @@ export default function FinanceApp() {
                     required
                     type="number"
                     min="1"
-                    step="1000"
+                    step="1"
                     value={form.amount || ""}
                     onChange={(event) =>
                       setForm((current) => ({
@@ -1034,10 +841,7 @@ export default function FinanceApp() {
                       }))
                     }
                   >
-                    {(form.type === "expense"
-                      ? EXPENSE_CATEGORIES
-                      : INCOME_CATEGORIES
-                    ).map((category) => (
+                    {(form.type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES).map((category) => (
                       <option key={category.name}>{category.name}</option>
                     ))}
                   </select>
@@ -1077,7 +881,9 @@ export default function FinanceApp() {
               {formError && <p className="form-error">{formError}</p>}
 
               <div className="modal-actions">
-                <button type="button" onClick={closeModal}>Batal</button>
+                <button type="button" onClick={closeModal}>
+                  Batal
+                </button>
                 <button className="primary-button" type="submit">
                   {editingId ? "Simpan Perubahan" : "Simpan Transaksi"}
                 </button>
@@ -1087,7 +893,11 @@ export default function FinanceApp() {
         </div>
       )}
 
-      {toast && <div className="toast" role="status">✓ {toast}</div>}
+      {toast && (
+        <div className="toast" role="status">
+          ✓ {toast}
+        </div>
+      )}
     </div>
   );
 }
