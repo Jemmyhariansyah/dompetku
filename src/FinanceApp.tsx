@@ -800,16 +800,17 @@ export default function FinanceApp() {
                   <b>Rp</b>
                   <input
                     required
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={form.amount || ""}
-                    onChange={(event) =>
+                    type="text"
+                    inputMode="numeric"
+                    value={form.amount ? form.amount.toLocaleString("id-ID") : ""}
+                    onChange={(event) => {
+                      const angka = event.target.value.replace(/\D/g, "");
+
                       setForm((current) => ({
                         ...current,
-                        amount: Number(event.target.value),
-                      }))
-                    }
+                        amount: angka ? Number(angka) : 0,
+                      }));
+                    }}
                     placeholder="0"
                   />
                 </div>
